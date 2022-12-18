@@ -1,0 +1,5 @@
+for_user: user
+for_group: users
+
+whitelist:
+- /dev/volumes/*

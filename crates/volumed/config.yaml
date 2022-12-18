@@ -1,0 +1,2 @@
+volume_group: volumes
+spare_bytes: 10737418240 # 10 GB

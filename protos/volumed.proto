@@ -1,0 +1,71 @@
+/**
+ * LVMd manages logical volumes of an LVM volume group.
+ *
+ * The protocol consists of two services:
+ * - VGService provides information of the volume group.
+ * - LVService provides management functions for logical volumes on the volume group.
+ */
+syntax = "proto3";
+package volumed;
+
+message Empty {}
+
+// Represents a logical volume
+message LogicalVolume {
+    string uuid = 1;
+    string name = 2;
+    uint64 capacity_bytes = 3;
+    string volume_group = 4;
+}
+
+// Available list of LogicalVolumes
+message GetLVListResponse {
+    repeated LogicalVolume volumes = 1;
+}
+
+// Represents the amount of space free, in bytes, for the tracked Volume Group
+message GetFreeBytesResponse {
+    uint64 bytes_free = 1;
+}
+
+message CreateLVRequest {
+    string name = 1;
+    uint64 capacity = 2;
+    repeated string tags = 3;
+}
+
+message DeleteLVRequest {
+    string name = 1;
+}
+
+message FormatLVRequest {
+    string name = 1;
+}
+
+message GetLVRequest {
+    oneof identifier {
+        string name = 1;
+        string uuid = 2;
+    }
+}
+
+// Service to retrieve information of the volume group.
+service VolumeService {
+    // Get the list of logical volumes in the volume group.
+    rpc GetLVList(Empty) returns (GetLVListResponse);
+
+    // Get the free space of the volume group in bytes.
+    rpc GetFreeBytes(Empty) returns (GetFreeBytesResponse);
+
+    // Create a LogicalVolume within the VolumeGroup
+    rpc CreateLogicalVolume(CreateLVRequest) returns (LogicalVolume);
+
+    // Format a LogicalVolume with XFS
+    rpc FormatLogicalVolume(FormatLVRequest) returns (Empty);
+
+    // Delete a LogicalVolume within the VolumeGroup
+    rpc DeleteLogicalVolume(DeleteLVRequest) returns (Empty);
+
+    // Get a specific LogicalVolume by name or UUID (uuid has preference)
+    rpc GetLogicalVolume(GetLVRequest) returns (LogicalVolume);
+}

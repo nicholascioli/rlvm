@@ -1,0 +1,49 @@
+syntax = "proto3";
+package mountd;
+
+message Empty {}
+
+// Represents a block device available for mounting
+message BlockDevice {
+    string path = 1;
+}
+
+message Mount {
+    string src = 1;
+    string dst = 2;
+}
+
+enum MountFlag {
+    UNKNOWN = 0;
+
+    READ_ONLY = 1;
+    BIND = 2;
+}
+
+message MountRequest {
+    Mount mount = 1;
+    repeated MountFlag flags = 2;
+}
+
+message MountResponse {}
+
+message UnmountRequest {
+    string path = 1;
+}
+
+message UnmountResponse {}
+
+message GetLvmBlockPathRequest {
+    string uuid = 1;
+}
+
+service MountService {
+    // Get the virtual path for an LVM device
+    rpc GetLvmBlockPath(GetLvmBlockPathRequest) returns (BlockDevice);
+
+    // Mount an XFS filesystem
+    rpc Mount(MountRequest) returns (MountResponse);
+
+    // Unmount an XFS filesystem
+    rpc Unmount(UnmountRequest) returns (UnmountResponse);
+}
